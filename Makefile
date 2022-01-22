@@ -116,6 +116,10 @@ include docker-env.mk
 
 all: native docker checks
 
+ku-remake: release-clean docker-clean release docker
+
+ku-clean: release-clean docker-clean
+
 checks: basic-checks unit-test integration-test
 
 basic-checks: license spelling linter
@@ -214,7 +218,7 @@ check-deps: buildenv
 $(BUILD_DIR)/%/chaintool: Makefile
 	@echo "Installing chaintool"
 	@mkdir -p $(@D)
-	curl -fL $(CHAINTOOL_URL) > $@
+	cp build/chaintool/hyperledger-fabric-chaintool-1.1.1.jar $@
 	chmod +x $@
 
 # We (re)build a package within a docker context but persist the $GOPATH/pkg
