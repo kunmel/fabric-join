@@ -19,13 +19,13 @@ import (
 	"github.com/hyperledger/fabric/core/common/ccprovider"
 	"github.com/hyperledger/fabric/core/common/validation"
 	"github.com/hyperledger/fabric/core/ledger"
+	"github.com/hyperledger/fabric/peer/cross"
 	"github.com/hyperledger/fabric/protos/common"
 	pb "github.com/hyperledger/fabric/protos/peer"
 	"github.com/hyperledger/fabric/protos/transientstore"
 	putils "github.com/hyperledger/fabric/protos/utils"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
-"github.com/hyperledger/fabric/peer/cross"
 )
 
 var endorserLogger = flogging.MustGetLogger("endorser")
@@ -290,9 +290,9 @@ func (e *Endorser) SimulateProposal(ctx context.Context, chainID string, txid st
 		endorserLogger.Errorf("[%s][%s] failed to invoke chaincode %s, error: %+v", chainID, shorttxid(txid), cid, err)
 		return nil, nil, nil, nil, err
 	}
-
+	res.TXID = txid
 	if txsim != nil {
-		if simResult, err = txsim.GetTxSimulationResults(); err != nil {
+		if simResult, err = txsim.GetTxSimulationResults(res); err != nil {
 			txsim.Done()
 			return nil, nil, nil, nil, err
 		}

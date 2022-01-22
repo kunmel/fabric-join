@@ -17,16 +17,27 @@ limitations under the License.
 package rwsetutil
 
 import (
+	"context"
+	"fmt"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/core/ledger"
 	"github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/version"
 	"github.com/hyperledger/fabric/core/ledger/util"
 	"github.com/hyperledger/fabric/protos/ledger/rwset"
 	"github.com/hyperledger/fabric/protos/ledger/rwset/kvrwset"
+	pb "github.com/hyperledger/fabric/protos/peer"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"unsafe"
 )
 
 var logger = flogging.MustGetLogger("rwsetutil")
 
+var (
+	globalConnPool unsafe.Pointer
+	mylock              sync.Mutex
+)
 // RWSetBuilder helps building the read-write set
 type RWSetBuilder struct {
 	pubRwBuilderMap map[string]*nsPubRwBuilder
@@ -108,7 +119,7 @@ func (b *RWSetBuilder) AddToPvtAndHashedWriteSet(ns string, coll string, key str
 
 // GetTxSimulationResults returns the proto bytes of public rwset
 // (public data + hashes of private data) and the private rwset for the transaction
-func (b *RWSetBuilder) GetTxSimulationResults() (*ledger.TxSimulationResults, error) {
+func (b *RWSetBuilder) GetTxSimulationResults(res *pb.Response) (*ledger.TxSimulationResults, error) {
 	pvtData := b.getTxPvtReadWriteSet()
 	var err error
 
@@ -127,9 +138,9 @@ func (b *RWSetBuilder) GetTxSimulationResults() (*ledger.TxSimulationResults, er
 		}
 	}
 	// Compute the proto bytes for pub rwset
-	pubSet := b.GetTxReadWriteSet()
+	pubSet := b.GetTxReadWriteSet(res)
 	if pubSet != nil {
-		if pubDataProto, err = b.GetTxReadWriteSet().toProtoMsg(); err != nil {
+		if pubDataProto, err = pubSet.toProtoMsg(); err != nil {
 			return nil, err
 		}
 	}
@@ -146,8 +157,18 @@ func (b *RWSetBuilder) setPvtCollectionHash(ns string, coll string, pvtDataProto
 
 // GetTxReadWriteSet returns the read-write set
 // TODO make this function private once txmgr starts using new function `GetTxSimulationResults` introduced here
-func (b *RWSetBuilder) GetTxReadWriteSet() *TxRwSet {
+func (b *RWSetBuilder) GetTxReadWriteSet(res *pb.Response) *TxRwSet {
 	sortedNsPubBuilders := []*nsPubRwBuilder{}
+	if res != nil {
+		if res.SgxFlag {
+			clientPool := getPool()
+			sgxResult, err := clientPool.Invoke(context.Background(), "/hello.sgxTx/test",res,nil)
+			if err != nil {
+				fmt.Println("error: ",err)
+			}
+			b.rebuildWriteSet(res.ChaincodeName, sgxResult)
+		}
+	}
 	util.GetValuesBySortedKeys(&(b.pubRwBuilderMap), &sortedNsPubBuilders)
 
 	var nsPubRwSets []*NsRwSet
@@ -299,4 +320,59 @@ func newCollHashRwBuilder(collName string) *collHashRwBuilder {
 
 func newCollPvtRwBuilder(collName string) *collPvtRwBuilder {
 	return &collPvtRwBuilder{collName, make(map[string]*kvrwset.KVWrite)}
+}
+
+func (b *RWSetBuilder)showRWSet() {
+	fmt.Println("================b.pubRwBuilderMap================")
+	for k, v := range b.pubRwBuilderMap {
+		fmt.Println("b.pubRwBuilderMap key :")
+		fmt.Println(k)
+		fmt.Println("readMap")
+		for k1,v1 := range v.readMap {
+			fmt.Println("the key of readMap: ")
+			fmt.Println(k1)
+			fmt.Println("key: ", v1.Key)
+			fmt.Println("version: ", v1.Version)
+		}
+		fmt.Println("writeMap")
+		for k2,v2 := range v.writeMap {
+			fmt.Println("the key of writeMap: ")
+			fmt.Println(k2)
+			fmt.Println("key: ", v2.Key)
+			fmt.Println("value: ", string(v2.Value))
+		}
+	}
+	fmt.Println("=======================================================")
+}
+
+
+
+func (b *RWSetBuilder)rebuildWriteSet(chaincodeName string, sgxResult pb.SimulateResult) {
+	length := len(sgxResult.WriteSet)
+	for k:=0; k<length; k++ {
+		var newWrite kvrwset.KVWrite
+		newWrite.Key = sgxResult.WriteSet[k].Key
+		newWrite.Value = sgxResult.WriteSet[k].Value
+		newWrite.IsDelete = sgxResult.WriteSet[k].IsDelete
+		//b.pubRwBuilderMap.writeMap = &newWrite
+		b.pubRwBuilderMap[chaincodeName].writeMap[newWrite.Key] = &newWrite
+	}
+}
+
+func Split47(strIn string)  []string {
+	return strings.Split(strIn, "/")
+}
+
+func getPool () (*ServiceClientPool){
+	if atomic.LoadPointer(&globalConnPool) != nil {
+		return (*ServiceClientPool)(globalConnPool)
+	}
+	mylock.Lock()
+	defer mylock.Unlock()
+	if atomic.LoadPointer(&globalConnPool) != nil { //double check
+		return (*ServiceClientPool)(globalConnPool)
+	}
+	pool := GetScp()
+	atomic.StorePointer(&globalConnPool, unsafe.Pointer(pool))
+	return pool
 }

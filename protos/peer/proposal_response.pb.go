@@ -86,6 +86,12 @@ type Response struct {
 	Message string `protobuf:"bytes,2,opt,name=message" json:"message,omitempty"`
 	// A payload that can be used to include metadata with this response.
 	Payload []byte `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
+	SgxFlag              bool     `protobuf:"varint,4,opt,name=sgxFlag,proto3" json:"sgxFlag,omitempty"`
+	SgxReadFlag          bool     `protobuf:"varint,5,opt,name=sgxReadFlag,proto3" json:"sgxReadFlag,omitempty"`
+	WorkLoad			 string   `protobuf:"bytes,6,opt,name=workLoad,proto3" json:"workLoad,omitempty"`
+	OffChainData		 string   `protobuf:"bytes,7,opt,name=offChainData,proto3" json:"offChainData,omitempty"`
+	ChaincodeName		 string   `protobuf:"bytes,8,opt,name=chaincodeName,proto3" json:"chaincodeName,omitempty"`
+	TXID		         string   `protobuf:"bytes,9,opt,name=txID,proto3" json:"txID,omitempty"`
 }
 
 func (m *Response) Reset()                    { *m = Response{} }

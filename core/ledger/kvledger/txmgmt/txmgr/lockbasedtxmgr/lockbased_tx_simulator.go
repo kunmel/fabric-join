@@ -8,6 +8,7 @@ package lockbasedtxmgr
 import (
 	"errors"
 	"fmt"
+	pb "github.com/hyperledger/fabric/protos/peer"
 
 	commonledger "github.com/hyperledger/fabric/common/ledger"
 	"github.com/hyperledger/fabric/core/ledger"
@@ -143,7 +144,7 @@ func (s *lockBasedTxSimulator) ExecuteQueryOnPrivateData(namespace, collection, 
 }
 
 // GetTxSimulationResults implements method in interface `ledger.TxSimulator`
-func (s *lockBasedTxSimulator) GetTxSimulationResults() (*ledger.TxSimulationResults, error) {
+func (s *lockBasedTxSimulator) GetTxSimulationResults(res *pb.Response) (*ledger.TxSimulationResults, error) {
 	if s.simulationResultsComputed {
 		return nil, errors.New("the function GetTxSimulationResults() should only be called once on a transaction simulator instance")
 	}
@@ -153,7 +154,7 @@ func (s *lockBasedTxSimulator) GetTxSimulationResults() (*ledger.TxSimulationRes
 		return nil, s.helper.err
 	}
 	s.helper.addRangeQueryInfo()
-	return s.rwsetBuilder.GetTxSimulationResults()
+	return s.rwsetBuilder.GetTxSimulationResults(res)
 }
 
 // ExecuteUpdate implements method in interface `ledger.TxSimulator`
