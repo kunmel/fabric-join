@@ -43,7 +43,7 @@
 
 BASE_VERSION = 1.2.1
 PREV_VERSION = 1.2.0
-CHAINTOOL_RELEASE=1.1.1
+CHAINTOOL_RELEASE=1.1.3
 BASEIMAGE_RELEASE=0.4.10
 
 # Allow to build as a submodule setting the main project to
@@ -83,7 +83,8 @@ GO_LDFLAGS = $(patsubst %,-X $(PKGNAME)/common/metadata.%,$(METADATA_VAR))
 
 GO_TAGS ?=
 
-CHAINTOOL_URL ?= https://nexus.hyperledger.org/content/repositories/releases/org/hyperledger/fabric/hyperledger-fabric/chaintool-$(CHAINTOOL_RELEASE)/hyperledger-fabric-chaintool-$(CHAINTOOL_RELEASE).jar
+# CHAINTOOL_URL ?= https://nexus.hyperledger.org/content/repositories/releases/org/hyperledger/fabric/hyperledger-fabric/chaintool-$(CHAINTOOL_RELEASE)/hyperledger-fabric-chaintool-$(CHAINTOOL_RELEASE).jar
+CHAINTOOL_URL ?= https://hyperledger.jfrog.io/hyperledger/fabric-maven/org/hyperledger/fabric-chaintool/$(CHAINTOOL_RELEASE)/fabric-chaintool-$(CHAINTOOL_RELEASE).jar
 
 export GO_LDFLAGS GO_TAGS
 
@@ -218,7 +219,7 @@ check-deps: buildenv
 $(BUILD_DIR)/%/chaintool: Makefile
 	@echo "Installing chaintool"
 	@mkdir -p $(@D)
-	cp build/chaintool/hyperledger-fabric-chaintool-1.1.1.jar $@
+	curl -fL $(CHAINTOOL_URL) > $@
 	chmod +x $@
 
 # We (re)build a package within a docker context but persist the $GOPATH/pkg
