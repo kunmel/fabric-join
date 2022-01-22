@@ -9,7 +9,6 @@ package valimpl
 import (
 	"bytes"
 	"fmt"
-
 	"github.com/hyperledger/fabric/core/ledger"
 	"github.com/hyperledger/fabric/core/ledger/customtx"
 	"github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/privacyenabledstate"
@@ -178,7 +177,7 @@ func processNonEndorserTx(txEnv *common.Envelope, txid string, txType common.Hea
 	if err = processor.GenerateSimulationResults(txEnv, sim, synchingState); err != nil {
 		return nil, err
 	}
-	if simRes, err = sim.GetTxSimulationResults(); err != nil {
+	if simRes, err = sim.GetTxSimulationResults(nil); err != nil {
 		return nil, err
 	}
 	return simRes.PubSimulationResults, nil
