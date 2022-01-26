@@ -270,6 +270,17 @@ func (v *TxValidator) Validate(block *common.Block) error {
 // allValidated returns error if some of the validation flags have not been set
 // during validation
 func (v *TxValidator) allValidated(txsfltr ledgerUtil.TxValidationFlags, block *common.Block) error {
+	for _, f := range txsfltr {
+		if peer.TxValidationCode(f) == peer.TxValidationCode_NOT_VALIDATED {
+			//return errors.Errorf("transaction %d in block %d has skipped validation", id, block.Header.Number)
+			return nil
+		}
+	}
+
+	return nil
+}
+/*
+func (v *TxValidator) allValidated(txsfltr ledgerUtil.TxValidationFlags, block *common.Block) error {
 	for id, f := range txsfltr {
 		if peer.TxValidationCode(f) == peer.TxValidationCode_NOT_VALIDATED {
 			return errors.Errorf("transaction %d in block %d has skipped validation", id, block.Header.Number)
@@ -278,6 +289,7 @@ func (v *TxValidator) allValidated(txsfltr ledgerUtil.TxValidationFlags, block *
 
 	return nil
 }
+*/
 
 func markTXIdDuplicates(txids []string, txsfltr ledgerUtil.TxValidationFlags) {
 	txidMap := make(map[string]struct{})
@@ -321,7 +333,7 @@ func (v *TxValidator) validateTx(req *blockValidationRequest, results chan<- *bl
 		return
 	} else if env != nil {
 		//NEW add
-		fmt.Println("core/commi/txva/validator.go validateTx() envelope = ", env)
+		//fmt.Println("core/commi/txva/validator.go validateTx() envelope = ", env)
 		crossInfo = env.CrossInfo  // crossInfo此时为confirmation内容
 		if string(crossInfo) == "confirmation"{
 			results <- &blockValidationResult{
