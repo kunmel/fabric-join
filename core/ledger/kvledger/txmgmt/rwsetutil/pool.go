@@ -303,7 +303,7 @@ func (sc *ServiceClientPool) Invoke(ctx context.Context, fullMethod string, args
 }
 
 const (
-	ADDRESS = "192.168.1.105:1234"
+	ADDRESS = "39.107.98.10:1234"
 	//ADDRESS = "192.168.1.106:1234"
 	SERVICENAME = "hello.sgxTx"
 )
