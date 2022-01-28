@@ -27,7 +27,7 @@ type NewTxRequest struct {
 func (m *NewTxRequest) Reset()                    { *m = NewTxRequest{} }
 func (m *NewTxRequest) String() string            { return proto.CompactTextString(m) }
 func (*NewTxRequest) ProtoMessage()               {}
-func (*NewTxRequest) Descriptor() ([]byte, []int) { return fileDescriptor11, []int{0} }
+func (*NewTxRequest) Descriptor() ([]byte, []int) { return fileDescriptor13, []int{0} }
 
 func (m *NewTxRequest) GetTxID() string {
 	if m != nil {
@@ -65,7 +65,7 @@ type DataMap struct {
 func (m *DataMap) Reset()                    { *m = DataMap{} }
 func (m *DataMap) String() string            { return proto.CompactTextString(m) }
 func (*DataMap) ProtoMessage()               {}
-func (*DataMap) Descriptor() ([]byte, []int) { return fileDescriptor11, []int{1} }
+func (*DataMap) Descriptor() ([]byte, []int) { return fileDescriptor13, []int{1} }
 
 func (m *DataMap) GetKey() string {
 	if m != nil {
@@ -89,7 +89,7 @@ type SimulateResult struct {
 func (m *SimulateResult) Reset()                    { *m = SimulateResult{} }
 func (m *SimulateResult) String() string            { return proto.CompactTextString(m) }
 func (*SimulateResult) ProtoMessage()               {}
-func (*SimulateResult) Descriptor() ([]byte, []int) { return fileDescriptor11, []int{2} }
+func (*SimulateResult) Descriptor() ([]byte, []int) { return fileDescriptor13, []int{2} }
 
 func (m *SimulateResult) GetTxID() string {
 	if m != nil {
@@ -114,7 +114,7 @@ type SimulateWriteSet struct {
 func (m *SimulateWriteSet) Reset()                    { *m = SimulateWriteSet{} }
 func (m *SimulateWriteSet) String() string            { return proto.CompactTextString(m) }
 func (*SimulateWriteSet) ProtoMessage()               {}
-func (*SimulateWriteSet) Descriptor() ([]byte, []int) { return fileDescriptor11, []int{3} }
+func (*SimulateWriteSet) Descriptor() ([]byte, []int) { return fileDescriptor13, []int{3} }
 
 func (m *SimulateWriteSet) GetKey() string {
 	if m != nil {
@@ -145,7 +145,7 @@ type TestMsg struct {
 func (m *TestMsg) Reset()                    { *m = TestMsg{} }
 func (m *TestMsg) String() string            { return proto.CompactTextString(m) }
 func (*TestMsg) ProtoMessage()               {}
-func (*TestMsg) Descriptor() ([]byte, []int) { return fileDescriptor11, []int{4} }
+func (*TestMsg) Descriptor() ([]byte, []int) { return fileDescriptor13, []int{4} }
 
 func (m *TestMsg) GetName() string {
 	if m != nil {
@@ -168,7 +168,7 @@ type TestRsp struct {
 func (m *TestRsp) Reset()                    { *m = TestRsp{} }
 func (m *TestRsp) String() string            { return proto.CompactTextString(m) }
 func (*TestRsp) ProtoMessage()               {}
-func (*TestRsp) Descriptor() ([]byte, []int) { return fileDescriptor11, []int{5} }
+func (*TestRsp) Descriptor() ([]byte, []int) { return fileDescriptor13, []int{5} }
 
 func (m *TestRsp) GetContent() string {
 	if m != nil {
@@ -410,7 +410,7 @@ var _SgxService_serviceDesc = grpc.ServiceDesc{
 	Metadata: "peer/sgx.proto",
 }
 
-func init() { proto.RegisterFile("peer/sgx.proto", fileDescriptor11) }
+func init() { proto.RegisterFile("peer/sgx.proto", fileDescriptor13) }
 
 var fileDescriptor13 = []byte{
 	// 410 bytes of a gzipped FileDescriptorProto

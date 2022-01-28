@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+option go_package = "github.com/hyperledger/fabric/protos/peer";
+
+package protos;
+
+service SgxService {
+  rpc SubmitTx(stream NewTxRequest) returns (stream SimulateResult) {}
+  rpc NewSgxTx(NewTxRequest) returns (stream SimulateResult) {}
+  rpc GrpcTest(TestMsg) returns (stream TestRsp) {}
+}
+
+
+message NewTxRequest {
+  string TxID = 1;
+  repeated DataMap OnChainData = 2;
+  string OffChainData = 3;
+  string WorkLoad = 4;
+}
+
+message DataMap {
+  string key = 1;
+  string value = 2;
+}
+message SimulateResult {
+  string TxID = 1;
+  repeated SimulateWriteSet WriteSet = 2;
+}
+
+message SimulateWriteSet {
+  string key = 1;
+  bool IsDelete = 2;
+  bytes Value = 3;
+}
+
+message TestMsg {
+  string name = 1;
+  string content = 2;
+}
+
+message TestRsp {
+  string content = 1;
+}
