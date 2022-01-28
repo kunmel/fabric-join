@@ -35,6 +35,7 @@ func Success(payload []byte) pb.Response {
 	return pb.Response{
 		Status:  OK,
 		Payload: payload,
+		SgxFlag: false,
 	}
 }
 
@@ -42,5 +43,16 @@ func Error(msg string) pb.Response {
 	return pb.Response{
 		Status:  ERROR,
 		Message: msg,
+		SgxFlag: false,
+	}
+}
+func SgxSuccess(payload []byte, sgxFlag bool, workload string, offchainData string, chaincodeName string) pb.Response {
+	return pb.Response{
+		Status:        OK,
+		Payload:       payload,
+		SgxFlag:       sgxFlag,
+		WorkLoad:      workload,
+		OffChainData:  offchainData,
+		ChaincodeName: chaincodeName,
 	}
 }
